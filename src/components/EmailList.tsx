@@ -1,13 +1,23 @@
 import React from 'react';
-import { useVirtual } from '@tanstack/react-virtual';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { formatDistanceToNow } from 'date-fns';
 import { Paperclip } from 'lucide-react';
 
-const EmailList = () => {
+interface Email {
+  id: number;
+  sender: string;
+  subject: string;
+  preview: string;
+  timestamp: Date;
+  hasAttachments: boolean;
+  isUnread: boolean;
+}
+
+const EmailList: React.FC = () => {
   const parentRef = React.useRef<HTMLDivElement>(null);
   
   // Placeholder data - will be replaced with Redux data
-  const emails = Array.from({ length: 100 }, (_, i) => ({
+  const emails: Email[] = Array.from({ length: 100 }, (_, i) => ({
     id: i,
     sender: 'example@mail.tm',
     subject: `Test Email ${i}`,
@@ -17,10 +27,10 @@ const EmailList = () => {
     isUnread: Math.random() > 0.5,
   }));
 
-  const rowVirtualizer = useVirtual({
-    size: emails.length,
-    parentRef,
-    estimateSize: React.useCallback(() => 80, []),
+  const rowVirtualizer = useVirtualizer({
+    count: emails.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 80,
     overscan: 5,
   });
 
@@ -28,13 +38,13 @@ const EmailList = () => {
     <div ref={parentRef} className="h-full overflow-auto">
       <div
         className="relative w-full"
-        style={{ height: `${rowVirtualizer.totalSize}px` }}
+        style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
       >
-        {rowVirtualizer.virtualItems.map((virtualRow) => {
+        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
           const email = emails[virtualRow.index];
           return (
             <div
-              key={virtualRow.index}
+              key={virtualRow.key}
               className={`absolute top-0 left-0 w-full ${
                 email.isUnread ? 'bg-blue-50' : 'bg-white'
               } border-b border-gray-200 hover:bg-gray-50 cursor-pointer`}
