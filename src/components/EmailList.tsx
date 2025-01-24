@@ -1,5 +1,5 @@
 import React from 'react';
-import { useVirtual } from 'react-virtual';
+import { useVirtual } from '@tanstack/react-virtual';
 import { formatDistanceToNow } from 'date-fns';
 import { Paperclip } from 'lucide-react';
 
